@@ -1,0 +1,83 @@
+syntax = "proto3";
+package udp2mysql.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/hi20160616/udp2mysql/api/udp2mysql/v1;v1";
+
+service UDPPacketApi{
+  rpc ListUDPPackets(ListUDPPacketsRequest) returns (ListUDPPacketsResponse){}
+  rpc GetUDPPacket(GetUDPPacketRequest) returns (UDPPacket){}
+  rpc CreateUDPPacket(CreateUDPPacketRequest) returns (UDPPacket) {}
+  // UpdateUDPPacket MUST have no rename or move feature.
+  rpc UpdateUDPPacket(UpdateUDPPacketRequest) returns (UDPPacket) {}
+  rpc DeleteUDPPacket(DeleteUDPPacketRequest) returns (google.protobuf.Empty) {}
+}
+
+message UDPPacket {
+  // Resource name of the UDPPacket. It must have the format of "shelves/*/books/*".
+  // For example: "shelves/shelf1/books/book2".
+  string name = 1;
+  string id = 2;
+  string title = 3;
+  string content = 4;
+  google.protobuf.Timestamp update_time = 5;
+}
+
+message ListUDPPacketsRequest {
+  // Resource name of the parent resource where to create the udp_packet.
+  // For example: "shelves/shelf1".
+  string parent = 1;
+  // The maximum number of items to return.
+  int32 page_size = 2;
+  // The next_page_token value returned from a previous List request, if any.
+  string page_token = 3;
+}
+
+message ListUDPPacketsResponse {
+  // The field name should match the noun "udp_packet" in the method name.  There
+  // will be a maximum number of items returned based on the page_size field
+  // in the request.
+  repeated UDPPacket udp_packets = 1;
+
+  // Token to retrieve the next page of results, or empty if there are no
+  // more results in the list.
+  string next_page_token = 2;
+}
+
+message GetUDPPacketRequest {
+  // Resource name of a UDPPacket. For example: "shelves/shelf1/books/book2".
+  string name = 1;
+}
+
+message CreateUDPPacketRequest {
+  // Resource name of the parent resource where to create the udp_packet.
+  // For example: "shelves/shelf1".
+  string parent = 1;
+  // The udp_packet id to use for this udp_packet
+  string udp_packet_id = 3;
+  // The udp_packet resource to create.
+  // The field name should match the Noun in the method name.
+  UDPPacket udp_packet = 2;
+}
+
+message UpdateUDPPacketRequest {
+  // Resource name of the parent resource where to create the udp_packet.
+  // For example: "shelves/shelf1".
+  string parent = 1;
+  // The udp_packet resource which replaces the resource on the server.
+  UDPPacket udp_packet = 2;
+  // The update mask applies to the resource. For the `FieldMask` definition,
+  // see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
+  google.protobuf.FieldMask update_mask = 3;
+}
+
+message DeleteUDPPacketRequest {
+  // Resource name of the parent resource where to create the udp_packet.
+  // For example: "shelves/shelf1".
+  string parent = 1;
+  string name = 2;
+}
+
