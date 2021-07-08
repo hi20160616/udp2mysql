@@ -2,6 +2,7 @@ package mariadb
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/hi20160616/udp2mysql/configs"
 )
@@ -20,6 +21,11 @@ func NewUDPPacketClient() *UDPPacketClient {
 }
 
 func (uc *UDPPacketClient) Query() *UDPPacketQuery {
+	return &UDPPacketQuery{}
+}
+
+func (uc *UDPPacketClient) Create() *UDPPacketQuery {
+	fmt.Println("Create UDPPacket at mariadb.go")
 	return &UDPPacketQuery{}
 }
 

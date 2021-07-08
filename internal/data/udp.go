@@ -40,6 +40,10 @@ func (ur *udpPacketRepo) GetUDPPackets(ctx context.Context, name string) (*biz.U
 }
 
 func (ur *udpPacketRepo) CreateUDPPacket(ctx context.Context, udp *biz.UDPPacket) (*biz.UDPPacket, error) {
+	_, err := ur.data.db.UDPPacket.Create().Save(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return nil, nil
 }
 

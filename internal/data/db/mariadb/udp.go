@@ -1,6 +1,11 @@
 package mariadb
 
-import "google.golang.org/protobuf/types/known/timestamppb"
+import (
+	"context"
+	"fmt"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
+)
 
 type UDPPacket struct {
 	ID, Title, Content string
@@ -12,6 +17,11 @@ type UDPPacketQuery struct {
 	offset   int64
 	query    string
 	keywords []string
+}
+
+func (uq *UDPPacketQuery) Save(ctx context.Context) (*UDPPacket, error) {
+	fmt.Println("")
+	return nil, nil
 }
 
 func (uq *UDPPacketQuery) Query() ([]*UDPPacket, error) {
