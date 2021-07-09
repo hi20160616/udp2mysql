@@ -2,7 +2,6 @@ package mariadb
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/hi20160616/udp2mysql/configs"
 )
@@ -14,18 +13,10 @@ type Client struct {
 }
 
 type UDPPacketClient struct {
-}
-
-func NewUDPPacketClient() *UDPPacketClient {
-	return &UDPPacketClient{}
+	db *sql.DB
 }
 
 func (uc *UDPPacketClient) Query() *UDPPacketQuery {
-	return &UDPPacketQuery{}
-}
-
-func (uc *UDPPacketClient) Create() *UDPPacketQuery {
-	fmt.Println("Create UDPPacket at mariadb.go")
 	return &UDPPacketQuery{}
 }
 
@@ -35,9 +26,5 @@ func open() (*sql.DB, error) {
 
 func NewClient() *Client {
 	db, err := open()
-	return &Client{db, nil, err}
-}
-
-func (c *Client) init() {
-	c.UDPPacket = NewUDPPacketClient()
+	return &Client{db, &UDPPacketClient{db}, err}
 }

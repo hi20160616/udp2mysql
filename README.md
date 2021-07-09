@@ -13,7 +13,7 @@ protoc --go_out=. --go_opt=paths=source_relative \
 
 ## MariaDB
 
-Refer: [mariadb docker official images](!https://hub.docker.com/_/mariadb)
+Refer: [mariadb docker official images](https://hub.docker.com/_/mariadb)
 ```bash
 $ docker pull mariadb
 docker run -p 3306:3306 --name=udp2mysql -v /my/own/datadir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD='<password>' -d mariadb:latest
