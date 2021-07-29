@@ -209,7 +209,7 @@ CREATE TABLE `global_priv` (
 
 LOCK TABLES `global_priv` WRITE;
 /*!40000 ALTER TABLE `global_priv` DISABLE KEYS */;
-INSERT INTO `global_priv` VALUES ('localhost','mariadb.sys','{\"access\":0,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"\",\"account_locked\":true,\"password_last_changed\":0}'),('localhost','root','{\"access\":549755813887,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"*D1CA624B41D1E1669874383C0B044A42C6945F34\",\"password_last_changed\":1625748710,\"version_id\":100511}'),('%','root','{\"access\":549755813887,\"version_id\":100511,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"*D1CA624B41D1E1669874383C0B044A42C6945F34\",\"password_last_changed\":1625748710}'),('%','udp2mysql','{\"access\":0,\"version_id\":100511,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"*D4CECBA84F0A507325CD8AA82FCDE04EA8BE56B0\",\"password_last_changed\":1625750693}');
+INSERT INTO `global_priv` VALUES ('localhost','mariadb.sys','{\"access\":0,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"\",\"account_locked\":true,\"password_last_changed\":0}'),('localhost','root','{\"access\":549755813887,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"*D1CA624B41D1E1669874383C0B044A42C6945F34\",\"password_last_changed\":1625748710,\"version_id\":100511}'),('%','root','{\"access\":549755813887,\"version_id\":100511,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"*D1CA624B41D1E1669874383C0B044A42C6945F34\",\"password_last_changed\":1625748710}'),('%','udp2mysql','{\"access\":0,\"version_id\":100511,\"plugin\":\"mysql_native_password\",\"authentication_string\":\"*4F5C194D3DC50A7DDE187CDC61B6F4E2DA256B2F\",\"password_last_changed\":1627567886}');
 /*!40000 ALTER TABLE `global_priv` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -907,7 +907,7 @@ CREATE TABLE `udp_packets` (
   `name` varchar(32) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `content` mediumtext DEFAULT NULL,
-  `update_time` bigint(19) DEFAULT NULL,
+  `update_time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -918,6 +918,7 @@ CREATE TABLE `udp_packets` (
 
 LOCK TABLES `udp_packets` WRITE;
 /*!40000 ALTER TABLE `udp_packets` DISABLE KEYS */;
+INSERT INTO `udp_packets` VALUES ('2c8906da0775c93fdcb57b401e622e18','test name','test title','test content','2021-07-29 23:44:13');
 /*!40000 ALTER TABLE `udp_packets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -961,4 +962,4 @@ USE `udp2mysql`;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-07-08 13:31:47
+-- Dump completed on 2021-07-29 15:45:40

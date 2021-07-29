@@ -34,7 +34,7 @@ Create Tables
 MariaDB [udp2mysql]> DROP TABLE udp_packets;
 Query OK, 0 rows affected (0.003 sec)
 
-MariaDB [udp2mysql]> CREATE TABLE udp_packets (id VARCHAR(32) NOT NULL, name VARCHAR(32), title VARCHAR(255), content TEXT(65535), update_time BIGINT(19), UNIQUE KEY (id));
+MariaDB [udp2mysql]> CREATE TABLE udp_packets (id VARCHAR(32) NOT NULL, name VARCHAR(32), title VARCHAR(255), content TEXT(65535), update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, UNIQUE KEY (id));
 Query OK, 0 rows affected (0.005 sec)
 
 MariaDB [udp2mysql]> DESC udp_packets;

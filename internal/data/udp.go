@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hi20160616/udp2mysql/internal/biz"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var _ biz.UDPPacketRepo = new(udpPacketRepo)
@@ -29,7 +30,7 @@ func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, 
 			Id:         u.ID,
 			Title:      u.Title,
 			Content:    u.Content,
-			UpdateTime: &u.UpdateTime,
+			UpdateTime: timestamppb.New(u.UpdateTime),
 		})
 	}
 	return bus, nil
