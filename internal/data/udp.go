@@ -20,7 +20,7 @@ func NewUDPPacketRepo(data *Data) biz.UDPPacketRepo {
 }
 
 func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, error) {
-	us, err := ur.data.db.UDPPacket.Query().All(ctx)
+	us, err := ur.data.db.UDPPacket.NewQuery().All(ctx)
 	if err != nil {
 		return nil, err
 	}

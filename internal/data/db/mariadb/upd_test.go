@@ -26,7 +26,7 @@ func TestListUDPPackets(t *testing.T) {
 		t.Errorf("%v", c.Err)
 		return
 	}
-	got, err := c.UDPPacket.Query().All(context.Background())
+	got, err := c.UDPPacket.NewQuery().All(context.Background())
 	if err != nil {
 		t.Errorf("%v", err)
 		return
