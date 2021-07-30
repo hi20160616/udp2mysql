@@ -43,7 +43,8 @@ func setRootPath() error {
 }
 
 func load() error {
-	f, err := os.ReadFile(filepath.Join(V.RootPath, "configs/configs.json"))
+	cf := filepath.Join(V.RootPath, "configs/configs.json")
+	f, err := os.ReadFile(cf)
 	if err != nil {
 		return err
 	}
@@ -62,17 +63,17 @@ func init() {
 func rootPath4Test() int {
 	ps := strings.Split(os.Args[0], ProjectName)
 	n := 0
-	if len(ps) == 1 {
+	if len(ps) == 1 { // go test
 		if runtime.GOOS == "windows" {
 			n = strings.Count(ps[0], "\\") - 4
 		} else {
 			n = strings.Count(ps[0], "/") - 4
 		}
-	} else {
+	} else { // dlv
 		if runtime.GOOS == "windows" {
-			n = strings.Count(ps[1], "\\")
+			n = strings.Count(ps[1], "\\") - 1
 		} else {
-			n = strings.Count(ps[1], "/")
+			n = strings.Count(ps[1], "/") - 1
 		}
 	}
 	for i := 0; i < n; i++ {

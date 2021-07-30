@@ -20,12 +20,12 @@ func NewUDPPacketRepo(data *Data) biz.UDPPacketRepo {
 }
 
 func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, error) {
-	us, err := ur.data.db.UDPPacket.Query().List()
+	us, err := ur.data.db.UDPPacket.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
 	bus := make([]*biz.UDPPacket, 0)
-	for _, u := range us {
+	for _, u := range us.Collection {
 		bus = append(bus, &biz.UDPPacket{
 			Id:         u.ID,
 			Title:      u.Title,

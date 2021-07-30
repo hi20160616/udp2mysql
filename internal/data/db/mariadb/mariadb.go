@@ -2,7 +2,6 @@ package mariadb
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/hi20160616/udp2mysql/configs"
 )
@@ -17,12 +16,7 @@ type UDPPacketClient struct {
 	db *sql.DB
 }
 
-func (uc *UDPPacketClient) Query() *UDPPacketQuery {
-	return &UDPPacketQuery{}
-}
-
 func open() (*sql.DB, error) {
-	fmt.Println(configs.V.Database.Driver)
 	return sql.Open(configs.V.Database.Driver, configs.V.Database.Source)
 }
 

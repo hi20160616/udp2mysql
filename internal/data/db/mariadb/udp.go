@@ -18,6 +18,10 @@ type UDPPacket struct {
 	UpdateTime               time.Time
 }
 
+type UDPPackets struct {
+	Collection []*UDPPacket
+}
+
 type UDPPacketQuery struct {
 	db       *sql.DB
 	limit    int
@@ -53,10 +57,41 @@ func (uq *UDPPacketQuery) Save(ctx context.Context) (*UDPPacket, error) {
 	return nil, nil
 }
 
-func (uq *UDPPacketQuery) Query() ([]*UDPPacket, error) {
-	return nil, nil
+func (uc *UDPPacketClient) Query() *UDPPacketQuery {
+	q := "SELECT * FROM udp_packets"
+	return &UDPPacketQuery{
+		db:    uc.db,
+		query: q,
+	}
 }
 
-func (uq *UDPPacketQuery) List() ([]*UDPPacket, error) {
-	return nil, nil
+func (uq *UDPPacketQuery) All(ctx context.Context) (*UDPPackets, error) {
+	rows, err := uq.db.Query(uq.query)
+	if err != nil {
+		return nil, err
+	}
+	return mkUDPPacket(rows)
+}
+
+func mkUDPPacket(rows *sql.Rows) (*UDPPackets, error) {
+	var id, name, title, content sql.NullString
+	var update_time sql.NullTime
+	var udp_packets = &UDPPackets{}
+	for rows.Next() {
+		if err := rows.Scan(&id, &name, &title, &content, &update_time); err != nil {
+			return nil, errors.WithMessage(err, "mkUDPPacket rows.Scan error")
+		}
+		udp_packets.Collection = append(udp_packets.Collection, &UDPPacket{
+			ID:         id.String,
+			Name:       name.String,
+			Title:      title.String,
+			Content:    content.String,
+			UpdateTime: update_time.Time,
+		})
+	}
+	// TODO: to confirm code below can make sence.
+	if err := rows.Err(); err != nil {
+		return nil, errors.WithMessage(err, "mkUDPPacket error")
+	}
+	return udp_packets, nil
 }
