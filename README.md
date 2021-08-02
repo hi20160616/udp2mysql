@@ -38,15 +38,15 @@ MariaDB [udp2mysql]> CREATE TABLE udp_packets (id VARCHAR(32) NOT NULL, name VAR
 Query OK, 0 rows affected (0.005 sec)
 
 MariaDB [udp2mysql]> DESC udp_packets;
-+-------------+--------------+------+-----+---------+-------+
-| Field       | Type         | Null | Key | Default | Extra |
-+-------------+--------------+------+-----+---------+-------+
-| id          | varchar(32)  | NO   | PRI | NULL    |       |
-| name        | varchar(32)  | YES  |     | NULL    |       |
-| title       | varchar(255) | YES  |     | NULL    |       |
-| content     | mediumtext   | YES  |     | NULL    |       |
-| update_time | bigint(19)   | YES  |     | NULL    |       |
-+-------------+--------------+------+-----+---------+-------+
++-------------+--------------+------+-----+---------------------+-------------------------------+
+| Field       | Type         | Null | Key | Default             | Extra                         |
++-------------+--------------+------+-----+---------------------+-------------------------------+
+| id          | varchar(32)  | NO   | PRI | NULL                |                               |
+| name        | varchar(32)  | YES  |     | NULL                |                               |
+| title       | varchar(255) | YES  |     | NULL                |                               |
+| content     | mediumtext   | YES  |     | NULL                |                               |
+| update_time | timestamp    | NO   |     | current_timestamp() | on update current_timestamp() |
++-------------+--------------+------+-----+---------------------+-------------------------------+
 5 rows in set (0.001 sec)
 ```
 Create User for the database  
