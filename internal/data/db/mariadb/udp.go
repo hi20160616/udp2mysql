@@ -61,10 +61,9 @@ func (uq *UDPPacketQuery) Save(ctx context.Context) (*UDPPacket, error) {
 }
 
 func (uc *UDPPacketClient) Query() *UDPPacketQuery {
-	q := "SELECT * FROM udp_packets"
 	return &UDPPacketQuery{
 		db:    uc.db,
-		query: q,
+		query: "SELECT * FROM udp_packets",
 	}
 }
 
