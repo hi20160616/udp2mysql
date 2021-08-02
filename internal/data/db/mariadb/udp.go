@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -23,11 +24,13 @@ type UDPPackets struct {
 }
 
 type UDPPacketQuery struct {
-	db       *sql.DB
-	limit    int
-	offset   int64
-	query    string
-	keywords []string
+	db         *sql.DB
+	limit      int
+	offset     int64
+	query      string
+	predicates [][4]string // [ ["name", "=", "jack", "and"], ["title", "like", "anything", ""] ]
+	args       []interface{}
+	keywords   []string
 }
 
 func (uc *UDPPacketClient) Create() *UDPPacketQuery {
@@ -66,11 +69,37 @@ func (uc *UDPPacketClient) Query() *UDPPacketQuery {
 }
 
 func (uq *UDPPacketQuery) All(ctx context.Context) (*UDPPackets, error) {
-	rows, err := uq.db.Query(uq.query)
+	if err := uq.prepareQuery(ctx); err != nil {
+		return nil, err
+	}
+	rows, err := uq.db.Query(uq.query, uq.args...)
+	// rows, err := uq.db.Query("SELECT * FROM udp_packets WHERE name like ?", "%%test%%")
 	if err != nil {
 		return nil, err
 	}
 	return mkUDPPacket(rows)
+}
+
+// ps: {["name", "=", "jack", "and"], ["title", "like", "anything", ""]}
+func (uq *UDPPacketQuery) Where(ps ...[4]string) *UDPPacketQuery {
+	uq.predicates = append(uq.predicates, ps...)
+	return uq
+}
+
+func (uq *UDPPacketQuery) prepareQuery(ctx context.Context) error {
+	if uq.predicates != nil {
+		uq.query += " WHERE "
+		for _, p := range uq.predicates {
+			uq.query += fmt.Sprintf(" %s %s ? %s", p[0], p[1], p[3])
+			if strings.ToLower(p[1]) == "like" {
+				p[2] = fmt.Sprintf("%%%s%%", p[2])
+			} else {
+				p[2] = fmt.Sprintf("%s", p[2])
+			}
+			uq.args = append(uq.args, p[2])
+		}
+	}
+	return nil
 }
 
 func mkUDPPacket(rows *sql.Rows) (*UDPPackets, error) {
