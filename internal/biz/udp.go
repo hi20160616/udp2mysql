@@ -14,7 +14,7 @@ type UDPPacket struct {
 type UDPPacketRepo interface {
 	ListUDPPackets(ctx context.Context) ([]*UDPPacket, error)
 	// name means the last part of url path like `/udp/uuid`, uuid is name
-	GetUDPPackets(ctx context.Context, name string) (*UDPPacket, error)
+	GetUDPPacket(ctx context.Context, name string) (*UDPPacket, error)
 	CreateUDPPacket(ctx context.Context, udp *UDPPacket) (*UDPPacket, error)
 	UpdateUDPPacket(ctx context.Context, udp *UDPPacket) (*UDPPacket, error)
 	// name means the last part of url path like `/udp/uuid`, uuid is name

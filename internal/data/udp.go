@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/hi20160616/udp2mysql/internal/biz"
+	"github.com/hi20160616/udp2mysql/internal/data/db/mariadb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -20,7 +21,7 @@ func NewUDPPacketRepo(data *Data) biz.UDPPacketRepo {
 }
 
 func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, error) {
-	us, err := ur.data.db.UDPPacket.Query().All(ctx)
+	us, err := ur.data.dbClient.UDPPacket.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -36,16 +37,32 @@ func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, 
 	return bus, nil
 }
 
-func (ur *udpPacketRepo) GetUDPPackets(ctx context.Context, name string) (*biz.UDPPacket, error) {
-	return nil, nil
-}
-
-func (ur *udpPacketRepo) CreateUDPPacket(ctx context.Context, udp *biz.UDPPacket) (*biz.UDPPacket, error) {
-	_, err := ur.data.db.UDPPacket.Create().Save(ctx)
+func (ur *udpPacketRepo) GetUDPPacket(ctx context.Context, name string) (*biz.UDPPacket, error) {
+	upkt, err := ur.data.dbClient.UDPPacket.Query().Where([4]string{"name", "=", name}).First(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return &biz.UDPPacket{
+		Id:         upkt.ID,
+		Name:       upkt.Name,
+		Title:      upkt.Title,
+		Content:    upkt.Content,
+		UpdateTime: timestamppb.New(upkt.UpdateTime),
+	}, nil
+}
+
+func (ur *udpPacketRepo) CreateUDPPacket(ctx context.Context, udp *biz.UDPPacket) (*biz.UDPPacket, error) {
+	upktEnt := &mariadb.UDPPacket{
+		ID:         udp.Id,
+		Name:       udp.Name,
+		Title:      udp.Title,
+		Content:    udp.Content,
+		UpdateTime: udp.UpdateTime.AsTime(),
+	}
+	if err := ur.data.dbClient.UDPPacket.Insert(ctx, upktEnt); err != nil {
+		return nil, err
+	}
+	return udp, nil
 }
 
 func (ur *udpPacketRepo) UpdateUDPPacket(ctx context.Context, udp *biz.UDPPacket) (*biz.UDPPacket, error) {

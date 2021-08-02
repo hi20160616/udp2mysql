@@ -5,5 +5,5 @@ import (
 )
 
 type Data struct {
-	db *mariadb.Client
+	dbClient *mariadb.Client
 }

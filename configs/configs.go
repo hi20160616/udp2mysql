@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 )
 
@@ -31,7 +30,7 @@ var V = &configuration{}
 
 func setRootPath() error {
 	if strings.Contains(os.Args[0], ".test") {
-		rootPath4Test()
+		V.RootPath = "../../"
 		return nil
 	}
 	root, err := os.Getwd()
@@ -60,24 +59,24 @@ func init() {
 	}
 }
 
-func rootPath4Test() int {
-	ps := strings.Split(os.Args[0], ProjectName)
-	n := 0
-	if len(ps) == 1 { // go test
-		if runtime.GOOS == "windows" {
-			n = strings.Count(ps[0], "\\") - 4
-		} else {
-			n = strings.Count(ps[0], "/") - 4
-		}
-	} else { // dlv
-		if runtime.GOOS == "windows" {
-			n = strings.Count(ps[1], "\\") - 1
-		} else {
-			n = strings.Count(ps[1], "/") - 1
-		}
-	}
-	for i := 0; i < n; i++ {
-		V.RootPath = filepath.Join("../", V.RootPath)
-	}
-	return n
-}
+// func rootPath4Test() int {
+//         ps := strings.Split(os.Args[0], ProjectName)
+//         n := 0
+//         if len(ps) == 1 { // go test
+//                 if runtime.GOOS == "windows" {
+//                         n = strings.Count(ps[0], "\\") - 4
+//                 } else {
+//                         n = strings.Count(ps[0], "/") - 4
+//                 }
+//         } else { // dlv
+//                 if runtime.GOOS == "windows" {
+//                         n = strings.Count(ps[1], "\\") - 1
+//                 } else {
+//                         n = strings.Count(ps[1], "/") - 1
+//                 }
+//         }
+//         for i := 0; i < n; i++ {
+//                 V.RootPath = filepath.Join("../", V.RootPath)
+//         }
+//         return n
+// }

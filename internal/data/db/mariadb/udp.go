@@ -2,7 +2,6 @@ package mariadb
 
 import (
 	"context"
-	"crypto/md5"
 	"database/sql"
 	"fmt"
 	"strconv"
@@ -11,7 +10,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type UDPPacket struct {
@@ -25,39 +23,26 @@ type UDPPackets struct {
 
 type UDPPacketQuery struct {
 	db         *sql.DB
-	limit      int
-	offset     int64
+	limit      *int
+	offset     *int
 	query      string
 	predicates [][4]string // [ ["name", "=", "jack", "and"], ["title", "like", "anything", ""] ]
+	order      string
 	args       []interface{}
 	keywords   []string
 }
 
-func (uc *UDPPacketClient) Create() *UDPPacketQuery {
-	fmt.Println("Create UDPPacket at mariadb.go")
+func (uc *UDPPacketClient) Insert(ctx context.Context, upkt *UDPPacket) error {
 	q := "INSERT INTO udp_packets(id, name, title, content, update_time) VALUES(?,?,?,?,?)" +
 		" ON DUPLICATE KEY UPDATE id=?, name=?, title=?, content=?, update_time=?"
-	return &UDPPacketQuery{
-		db:    uc.db,
-		query: q,
-	}
-}
-
-func (uq *UDPPacketQuery) Save(ctx context.Context) (*UDPPacket, error) {
-	up := &UDPPacket{
-		ID:         fmt.Sprintf("%x", md5.Sum([]byte(strconv.Itoa(time.Now().Nanosecond())))),
-		Name:       "test name",
-		Title:      "test title",
-		Content:    "test content",
-		UpdateTime: timestamppb.Now().AsTime(),
-	}
+	uq := &UDPPacketQuery{db: uc.db, query: q}
 	_, err := uq.db.Exec(uq.query,
-		up.ID, up.Name, up.Title, up.Content, up.UpdateTime,
-		up.ID, up.Name, up.Title, up.Content, up.UpdateTime)
+		upkt.ID, upkt.Name, upkt.Title, upkt.Content, upkt.UpdateTime,
+		upkt.ID, upkt.Name, upkt.Title, upkt.Content, upkt.UpdateTime)
 	if err != nil {
-		return nil, errors.WithMessage(err, "mariadb: Save error")
+		return errors.WithMessage(err, "mariadb: Save error")
 	}
-	return nil, nil
+	return nil
 }
 
 func (uc *UDPPacketClient) Query() *UDPPacketQuery {
@@ -79,9 +64,35 @@ func (uq *UDPPacketQuery) All(ctx context.Context) (*UDPPackets, error) {
 	return mkUDPPacket(rows)
 }
 
+func (uq *UDPPacketQuery) First(ctx context.Context) (*UDPPacket, error) {
+	nodes, err := uq.Limit(1).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(nodes.Collection) == 0 {
+		return nil, ErrNotFound
+	}
+	return nodes.Collection[0], nil
+}
+
 // ps: {["name", "=", "jack", "and"], ["title", "like", "anything", ""]}
 func (uq *UDPPacketQuery) Where(ps ...[4]string) *UDPPacketQuery {
 	uq.predicates = append(uq.predicates, ps...)
+	return uq
+}
+
+func (uq *UDPPacketQuery) Order(condition string) *UDPPacketQuery {
+	uq.order = condition
+	return uq
+}
+
+func (uq *UDPPacketQuery) Limit(limit int) *UDPPacketQuery {
+	uq.limit = &limit
+	return uq
+}
+
+func (uq *UDPPacketQuery) Offset(offset int) *UDPPacketQuery {
+	uq.offset = &offset
 	return uq
 }
 
@@ -98,6 +109,21 @@ func (uq *UDPPacketQuery) prepareQuery(ctx context.Context) error {
 			uq.args = append(uq.args, p[2])
 		}
 	}
+	if uq.order != "" {
+		uq.query += " ORDER BY ?"
+		uq.args = append(uq.args, uq.order)
+	}
+	if uq.limit != nil {
+		uq.query += " LIMIT ?"
+		a := strconv.Itoa(*uq.limit)
+		uq.args = append(uq.args, a)
+	}
+	if uq.offset != nil {
+		uq.query += ", ?"
+		a := strconv.Itoa(*uq.offset)
+		uq.args = append(uq.args, a)
+	}
+	fmt.Println(uq.query)
 	return nil
 }
 
