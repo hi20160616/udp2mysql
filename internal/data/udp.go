@@ -66,7 +66,17 @@ func (ur *udpPacketRepo) CreateUDPPacket(ctx context.Context, udp *biz.UDPPacket
 }
 
 func (ur *udpPacketRepo) UpdateUDPPacket(ctx context.Context, udp *biz.UDPPacket) (*biz.UDPPacket, error) {
-	return nil, nil
+	upktEnt := &mariadb.UDPPacket{
+		ID:         udp.Id,
+		Name:       udp.Name,
+		Title:      udp.Title,
+		Content:    udp.Content,
+		UpdateTime: udp.UpdateTime.AsTime(),
+	}
+	if err := ur.data.dbClient.UDPPacket.Update(ctx, upktEnt); err != nil {
+		return nil, err
+	}
+	return udp, nil
 }
 
 func (ur *udpPacketRepo) DeleteUDPPacket(ctx context.Context, name string) error {

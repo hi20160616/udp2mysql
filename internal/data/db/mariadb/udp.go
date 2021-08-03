@@ -40,7 +40,17 @@ func (uc *UDPPacketClient) Insert(ctx context.Context, upkt *UDPPacket) error {
 		upkt.ID, upkt.Name, upkt.Title, upkt.Content, upkt.UpdateTime,
 		upkt.ID, upkt.Name, upkt.Title, upkt.Content, upkt.UpdateTime)
 	if err != nil {
-		return errors.WithMessage(err, "mariadb: Save error")
+		return errors.WithMessage(err, "mariadb: Insert error")
+	}
+	return nil
+}
+
+func (uc *UDPPacketClient) Update(ctx context.Context, upkt *UDPPacket) error {
+	q := "UPDATE udp_packets SET name=?, title=?, content=? WHERE id=?"
+	uq := &UDPPacketQuery{db: uc.db, query: q}
+	_, err := uq.db.Exec(uq.query, upkt.Name, upkt.Title, upkt.Content, upkt.ID)
+	if err != nil {
+		return errors.WithMessage(err, "mariadb: Update error")
 	}
 	return nil
 }
@@ -123,7 +133,6 @@ func (uq *UDPPacketQuery) prepareQuery(ctx context.Context) error {
 		a := strconv.Itoa(*uq.offset)
 		uq.args = append(uq.args, a)
 	}
-	fmt.Println(uq.query)
 	return nil
 }
 

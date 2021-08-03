@@ -95,3 +95,26 @@ func TestPrepareQuery(t *testing.T) {
 	}
 	fmt.Println(uq)
 }
+
+func TestUpdateUDPPacket(t *testing.T) {
+	c := NewClient()
+	if c.Err != nil {
+		t.Errorf("%v", c.Err)
+		return
+	}
+	upkt := &UDPPacket{
+		ID:      "2c8906da0775c93fdcb57b401e622e18",
+		Name:    "test7 name",
+		Title:   "test7 title",
+		Content: "test7 content",
+	}
+	if err := c.UDPPacket.Update(context.Background(), upkt); err != nil {
+		t.Error(err)
+	}
+	ps := [4]string{"id", "=", "2c8906da0775c93fdcb57b401e622e18"}
+	got, err := c.UDPPacket.Query().Where(ps).First(context.Background())
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(got)
+}
