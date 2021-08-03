@@ -80,5 +80,5 @@ func (ur *udpPacketRepo) UpdateUDPPacket(ctx context.Context, udp *biz.UDPPacket
 }
 
 func (ur *udpPacketRepo) DeleteUDPPacket(ctx context.Context, name string) error {
-	return nil
+	return ur.data.dbClient.UDPPacket.Delete(ctx, name)
 }

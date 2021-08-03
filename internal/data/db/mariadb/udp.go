@@ -46,11 +46,21 @@ func (uc *UDPPacketClient) Insert(ctx context.Context, upkt *UDPPacket) error {
 }
 
 func (uc *UDPPacketClient) Update(ctx context.Context, upkt *UDPPacket) error {
-	q := "UPDATE udp_packets SET name=?, title=?, content=? WHERE id=?"
-	uq := &UDPPacketQuery{db: uc.db, query: q}
+	uq := &UDPPacketQuery{db: uc.db,
+		query: "UPDATE udp_packets SET name=?, title=?, content=? WHERE id=?"}
 	_, err := uq.db.Exec(uq.query, upkt.Name, upkt.Title, upkt.Content, upkt.ID)
 	if err != nil {
 		return errors.WithMessage(err, "mariadb: Update error")
+	}
+	return nil
+}
+
+func (uc UDPPacketClient) Delete(ctx context.Context, id string) error {
+	uq := &UDPPacketQuery{db: uc.db,
+		query: "DELETE FROM udp_packets WHERE id = ?"}
+	_, err := uq.db.Exec(uq.query, id)
+	if err != nil {
+		return err
 	}
 	return nil
 }

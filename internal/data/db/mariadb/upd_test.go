@@ -3,8 +3,10 @@ package mariadb
 import (
 	"context"
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
@@ -117,4 +119,27 @@ func TestUpdateUDPPacket(t *testing.T) {
 		t.Error(err)
 	}
 	fmt.Println(got)
+}
+
+func TestDeleteUDPPacket(t *testing.T) {
+	c := NewClient()
+	if c.Err != nil {
+		t.Errorf("%v", c.Err)
+		return
+	}
+	id := "2c8906da0775c93fdcb57b401e622e18"
+	if err := c.UDPPacket.Delete(context.Background(), id); err != nil {
+		t.Error(err)
+	}
+	got, err := c.UDPPacket.Query().
+		Where([4]string{"id", "=", id}).
+		First(context.Background())
+	if err != nil {
+		if strings.Contains(err.Error(), "Item not found in table") {
+			return
+		}
+	}
+	if got != nil {
+		t.Error(errors.New("Delete failed."))
+	}
 }
