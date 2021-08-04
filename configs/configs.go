@@ -22,6 +22,7 @@ type configuration struct {
 		Driver string `json:"Driver"`
 		Source string `json:"Source"`
 	} `json:"database"`
+	RemoteAddr string `json:"remote_addr"`
 }
 
 type api struct {
