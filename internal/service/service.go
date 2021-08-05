@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/hi20160616/udp2mysql/api/udp2mysql/v1"
 	"github.com/hi20160616/udp2mysql/internal/biz"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type UDPService struct {
@@ -12,13 +13,13 @@ type UDPService struct {
 	udp *biz.UDPPacketUsecase
 }
 
-func NewUDPService(udp *biz.UDPPacketUsecase) *UDPService {
-	return &UDPService{
-		udp: udp,
-	}
-}
-
-func (us *UDPService) ListUDPPackets(ctx context.Context) (*pb.ListUDPPacketsResponse, error) {
+// func NewUDPService(udp *biz.UDPPacketUsecase) *UDPService {
+//         return &UDPService{
+//                 udp: udp,
+//         }
+// }
+//
+func (us *UDPService) ListUDPPackets(ctx context.Context, req *pb.ListUDPPacketsRequest) (*pb.ListUDPPacketsResponse, error) {
 	udps, err := us.udp.List(ctx)
 	if err != nil {
 		return nil, err
@@ -36,8 +37,8 @@ func (us *UDPService) ListUDPPackets(ctx context.Context) (*pb.ListUDPPacketsRes
 	return rt, nil
 }
 
-func (us *UDPService) GetUDPPacket(ctx context.Context, name string) (*pb.UDPPacket, error) {
-	udp, err := us.udp.Get(ctx, name)
+func (us *UDPService) GetUDPPacket(ctx context.Context, req *pb.GetUDPPacketRequest) (*pb.UDPPacket, error) {
+	udp, err := us.udp.Get(ctx, req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -90,6 +91,6 @@ func (us *UDPService) UpdateUDPPacket(ctx context.Context, req *pb.UpdateUDPPack
 	}, nil
 }
 
-func (us *UDPService) DeleteUDPPacket(ctx context.Context, name string) error {
-	return us.udp.Delete(ctx, name)
+func (us *UDPService) DeleteUDPPacket(ctx context.Context, req *pb.DeleteUDPPacketRequest) (*emptypb.Empty, error) {
+	return &emptypb.Empty{}, us.udp.Delete(ctx, req.Name)
 }
