@@ -19,7 +19,7 @@ func main() {
 	defer cancel()
 
 	g, ctx := errgroup.WithContext(ctx)
-	s, err := server.NewUDPReceiver(configs.V.RemoteAddr, 1024)
+	s, err := server.NewUDPReceiver(configs.V.RemoteAddr, 1<<10)
 	if err != nil {
 		log.Println(err)
 	}

@@ -49,6 +49,8 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
+		case <-time.After(30 * time.Second):
+			return fmt.Errorf("context was not done immediately")
 		default:
 			fmt.Print("-> ", string(ur.buf[0:n]), "\n")
 			reply := []byte(time.Now().String())
