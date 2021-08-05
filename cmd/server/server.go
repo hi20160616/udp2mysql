@@ -28,7 +28,7 @@ func main() {
 		return s.Start(ctx)
 	})
 	g.Go(func() error {
-		defer log.Printf("Server stop done.")
+		defer log.Printf("UDP Server stop done.")
 		<-ctx.Done() // wait for stop signal
 		log.Print("UDP Server stop now...")
 		return s.Stop(ctx)

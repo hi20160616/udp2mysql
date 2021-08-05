@@ -11,6 +11,7 @@ import (
 )
 
 type UDPReceiver struct {
+	conn    *net.UDPConn
 	udpAddr *net.UDPAddr
 	buf     []byte
 }
@@ -27,8 +28,6 @@ func NewUDPReceiver(addr string, bufSize int) (*UDPReceiver, error) {
 	}, nil
 }
 
-var done = make(chan struct{}, 1)
-
 func (ur *UDPReceiver) Start(ctx context.Context) error {
 	defer func() {
 		if err := recover(); err != nil {
@@ -43,30 +42,27 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 		return err
 	}
 	defer l.Close()
+	ur.conn = l
 
 	for {
 		n, addr, err := l.ReadFromUDP(ur.buf)
-		fmt.Print("-> ", string(ur.buf[0:n-1]))
-
-		reply := []byte(time.Now().String())
-		fmt.Printf("\nServer reply data: %s\n", reply)
-		_, err = l.WriteToUDP(reply, addr)
-		if err != nil {
-			log.Printf("%v", err)
-		}
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-done:
-			return nil
 		default:
+			fmt.Print("-> ", string(ur.buf[0:n]), "\n")
+			reply := []byte(time.Now().String())
+			fmt.Printf("Server reply data: %s\n", reply)
+			_, err = l.WriteToUDP(reply, addr)
+			if err != nil {
+				log.Printf("%v", err)
+			}
 		}
 	}
 }
 
 func (ur *UDPReceiver) Stop(ctx context.Context) error {
-	done <- struct{}{}
-	return ctx.Err()
+	return ur.conn.Close()
 }
 
 func PanicLog(_err error) error {
