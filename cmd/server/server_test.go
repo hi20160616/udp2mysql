@@ -1,7 +1,6 @@
-package server
+package main
 
 import (
-	"context"
 	"fmt"
 	"net"
 	"testing"
@@ -11,17 +10,11 @@ import (
 )
 
 func TestUDPReceiver(t *testing.T) {
-	ur, err := NewUDPReceiver(configs.V.RemoteAddr, 1024)
+	s, err := net.ResolveUDPAddr("udp4", configs.V.RemoteAddr)
 	if err != nil {
 		t.Error(err)
 	}
-	go func() {
-		if err := ur.Start(context.Background()); err != nil {
-			t.Error(err)
-		}
-	}()
-
-	c, err := net.DialUDP("udp4", nil, ur.udpAddr)
+	c, err := net.DialUDP("udp4", nil, s)
 	if err != nil {
 		t.Error(err)
 	}
@@ -40,8 +33,5 @@ func TestUDPReceiver(t *testing.T) {
 		}
 		fmt.Printf("Client receive: %s\n", string(buf[:n]))
 		time.Sleep(time.Second)
-	}
-	if err := ur.Stop(context.Background()); err != nil {
-		t.Error(err)
 	}
 }

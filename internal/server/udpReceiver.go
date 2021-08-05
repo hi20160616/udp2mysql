@@ -59,6 +59,7 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 			return ctx.Err()
 		case <-done:
 			return nil
+		default:
 		}
 	}
 }
