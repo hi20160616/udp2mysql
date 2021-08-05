@@ -20,7 +20,7 @@ func NewUDPPacketRepo(data *Data) biz.UDPPacketRepo {
 	}
 }
 
-func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, error) {
+func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) (*biz.UDPPackets, error) {
 	us, err := ur.data.dbClient.UDPPacket.Query().All(ctx)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,9 @@ func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) ([]*biz.UDPPacket, 
 			UpdateTime: timestamppb.New(u.UpdateTime),
 		})
 	}
-	return bus, nil
+	return &biz.UDPPackets{
+		UdpPackets: bus,
+	}, nil
 }
 
 func (ur *udpPacketRepo) GetUDPPacket(ctx context.Context, name string) (*biz.UDPPacket, error) {

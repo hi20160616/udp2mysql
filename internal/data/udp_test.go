@@ -39,7 +39,7 @@ func TestListUDPPackets(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	for _, e := range us {
+	for _, e := range us.UdpPackets {
 		fmt.Println(e)
 	}
 }

@@ -1,1 +1,95 @@
 package service
+
+import (
+	"context"
+
+	pb "github.com/hi20160616/udp2mysql/api/udp2mysql/v1"
+	"github.com/hi20160616/udp2mysql/internal/biz"
+)
+
+type UDPService struct {
+	pb.UnimplementedUDPPacketApiServer
+	udp *biz.UDPPacketUsecase
+}
+
+func NewUDPService(udp *biz.UDPPacketUsecase) *UDPService {
+	return &UDPService{
+		udp: udp,
+	}
+}
+
+func (us *UDPService) ListUDPPackets(ctx context.Context) (*pb.ListUDPPacketsResponse, error) {
+	udps, err := us.udp.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rt := &pb.ListUDPPacketsResponse{}
+	for _, e := range udps.UdpPackets {
+		rt.UdpPackets = append(rt.UdpPackets, &pb.UDPPacket{
+			Id:         e.Id,
+			Name:       e.Name,
+			Title:      e.Title,
+			Content:    e.Content,
+			UpdateTime: e.UpdateTime,
+		})
+	}
+	return rt, nil
+}
+
+func (us *UDPService) GetUDPPacket(ctx context.Context, name string) (*pb.UDPPacket, error) {
+	udp, err := us.udp.Get(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UDPPacket{
+		Id:         udp.Id,
+		Name:       udp.Name,
+		Title:      udp.Title,
+		Content:    udp.Content,
+		UpdateTime: udp.UpdateTime,
+	}, nil
+}
+
+func (us *UDPService) CreateUDPPacket(ctx context.Context, req *pb.CreateUDPPacketRequest) (*pb.UDPPacket, error) {
+	udp, err := us.udp.Create(ctx, &biz.UDPPacket{
+		Id:         req.UdpPacket.Id,
+		Name:       req.UdpPacket.Name,
+		Title:      req.UdpPacket.Title,
+		Content:    req.UdpPacket.Content,
+		UpdateTime: req.UdpPacket.UpdateTime,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UDPPacket{
+		Id:         udp.Id,
+		Name:       udp.Name,
+		Title:      udp.Title,
+		Content:    udp.Content,
+		UpdateTime: udp.UpdateTime,
+	}, nil
+}
+
+func (us *UDPService) UpdateUDPPacket(ctx context.Context, req *pb.UpdateUDPPacketRequest) (*pb.UDPPacket, error) {
+	udp, err := us.udp.Update(ctx, &biz.UDPPacket{
+		Id:         req.UdpPacket.Id,
+		Name:       req.UdpPacket.Name,
+		Title:      req.UdpPacket.Title,
+		Content:    req.UdpPacket.Content,
+		UpdateTime: req.UdpPacket.UpdateTime,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UDPPacket{
+		Id:         udp.Id,
+		Name:       udp.Name,
+		Title:      udp.Title,
+		Content:    udp.Content,
+		UpdateTime: udp.UpdateTime,
+	}, nil
+}
+
+func (us *UDPService) DeleteUDPPacket(ctx context.Context, name string) error {
+	return us.udp.Delete(ctx, name)
+}
