@@ -13,5 +13,9 @@
 	    "Driver": "mysql",
 	    "Source": "udp2mysql:udp2mysqlPasswd@tcp(127.0.0.1:3306)/udp2mysql?loc=Asia%2FShanghai&parseTime=true"
     },
-    "remote_addr":"127.0.0.1:123"
+    "remote_addr":"127.0.0.1:123",
+    "web":{
+	    "Addr": ":80",
+	    "Tmpl": "templates"
+    }
 }

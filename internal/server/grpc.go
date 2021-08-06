@@ -8,6 +8,7 @@ import (
 
 	pb "github.com/hi20160616/udp2mysql/api/udp2mysql/v1"
 	"github.com/hi20160616/udp2mysql/configs"
+	myerr "github.com/hi20160616/udp2mysql/errors"
 	"github.com/hi20160616/udp2mysql/internal/service"
 	"google.golang.org/grpc"
 )
@@ -41,7 +42,7 @@ func (gs *GRPC) Start(ctx context.Context) error {
 		if err := recover(); err != nil {
 			e := err.(error)
 			log.Println(e)
-			PanicLog(e)
+			myerr.PanicLog(e)
 		}
 	}()
 	defer gs.l.Close()

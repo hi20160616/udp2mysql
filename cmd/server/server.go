@@ -21,7 +21,7 @@ func main() {
 	g, ctx := errgroup.WithContext(ctx)
 
 	// UDPReceiver
-	s, err := server.NewUDPReceiver(configs.V.RemoteAddr, 1<<10)
+	s, err := server.NewUDPReceiver(configs.V.RemoteAddr, 1024)
 	if err != nil {
 		log.Println(err)
 	}
@@ -30,9 +30,9 @@ func main() {
 		return s.Start(ctx)
 	})
 	g.Go(func() error {
-		defer log.Printf("UDP Server stop done.")
+		defer log.Println("UDP Server stop done.")
 		<-ctx.Done() // wait for stop signal
-		log.Print("UDP Server stop now...")
+		log.Println("UDP Server stop now...")
 		return s.Stop(ctx)
 	})
 
@@ -46,10 +46,23 @@ func main() {
 		return gs.Start(ctx)
 	})
 	g.Go(func() error {
-		defer log.Printf("gRPC Server stop done.")
+		defer log.Println("gRPC Server stop done.")
 		<-ctx.Done()
-		log.Printf("gRPC Server stop now...")
+		log.Println("gRPC Server stop now...")
 		return gs.Stop(ctx)
+	})
+
+	// Web
+	ws := server.NewWebServer()
+	g.Go(func() error {
+		log.Println("Web Server start.")
+		return ws.Start(ctx)
+	})
+	g.Go(func() error {
+		defer log.Println("Web Server stop done.")
+		<-ctx.Done()
+		log.Println("Web Server stop now...")
+		return ws.Stop(ctx)
 	})
 
 	// Graceful stop

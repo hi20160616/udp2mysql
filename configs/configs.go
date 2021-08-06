@@ -23,6 +23,10 @@ type configuration struct {
 		Source string `json:"Source"`
 	} `json:"database"`
 	RemoteAddr string `json:"remote_addr"`
+	Web        struct {
+		Addr string `json:"Addr"`
+		Tmpl string `json:"Tmpl"`
+	} `json:"web"`
 }
 
 type api struct {

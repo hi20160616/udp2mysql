@@ -1,13 +1,14 @@
 package server
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"time"
+
+	"github.com/hi20160616/udp2mysql/configs"
+	myerr "github.com/hi20160616/udp2mysql/errors"
 )
 
 type UDPReceiver struct {
@@ -18,7 +19,7 @@ type UDPReceiver struct {
 
 // addr seems like "127.0.0.1:1234"
 func NewUDPReceiver(addr string, bufSize int) (*UDPReceiver, error) {
-	s, err := net.ResolveUDPAddr("udp4", addr)
+	s, err := net.ResolveUDPAddr("udp4", configs.V.RemoteAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -38,7 +39,7 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 		if err := recover(); err != nil {
 			e := err.(error)
 			log.Println(e)
-			PanicLog(e)
+			myerr.PanicLog(e)
 		}
 	}()
 	defer ur.conn.Close()
@@ -64,18 +65,4 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 
 func (ur *UDPReceiver) Stop(ctx context.Context) error {
 	return ur.conn.Close()
-}
-
-func PanicLog(_err error) error {
-	filePath := "./PanicLog.txt"
-	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	write.WriteString("[" + time.Now().Format(time.RFC3339) + "]--------------------------------------\n")
-	write.WriteString(_err.Error() + "\n")
-	write.Flush()
-	return nil
 }
