@@ -24,7 +24,7 @@ func TestCreateUDPPacket(t *testing.T) {
 		UpdateTime: timestamppb.Now(),
 	}
 	data := mariadb.NewClient()
-	ur := NewUDPPacketRepo(&Data{dbClient: data})
+	ur := NewUDPPacketRepo(&Data{DBClient: data})
 	up, err := ur.CreateUDPPacket(context.Background(), tc)
 	if err != nil {
 		t.Error(err)
@@ -34,7 +34,7 @@ func TestCreateUDPPacket(t *testing.T) {
 
 func TestListUDPPackets(t *testing.T) {
 	data := mariadb.NewClient()
-	ur := NewUDPPacketRepo(&Data{dbClient: data})
+	ur := NewUDPPacketRepo(&Data{DBClient: data})
 	us, err := ur.ListUDPPackets(context.Background())
 	if err != nil {
 		t.Error(err)
@@ -46,8 +46,8 @@ func TestListUDPPackets(t *testing.T) {
 
 func TestGetUDPPacket(t *testing.T) {
 	data := mariadb.NewClient()
-	ur := NewUDPPacketRepo(&Data{dbClient: data})
-	u, err := ur.GetUDPPacket(context.Background(), "test4 name")
+	ur := NewUDPPacketRepo(&Data{DBClient: data})
+	u, err := ur.GetUDPPacket(context.Background(), "ee4056c69f21b924a470c8a56a4e0f5b")
 	if err != nil {
 		t.Error(err)
 	}
@@ -56,8 +56,8 @@ func TestGetUDPPacket(t *testing.T) {
 
 func TestDeleteUDPPacket(t *testing.T) {
 	data := mariadb.NewClient()
-	ur := NewUDPPacketRepo(&Data{dbClient: data})
-	id := "28a228e245adc300a7439f3f7b1a2969"
+	ur := NewUDPPacketRepo(&Data{DBClient: data})
+	id := "ee4056c69f21b924a470c8a56a4e0f5b"
 	err := ur.DeleteUDPPacket(context.Background(), id)
 	if err != nil {
 		t.Error(err)

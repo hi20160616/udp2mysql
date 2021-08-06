@@ -19,6 +19,8 @@ func main() {
 	defer cancel()
 
 	g, ctx := errgroup.WithContext(ctx)
+
+	// UDPReceiver
 	s, err := server.NewUDPReceiver(configs.V.RemoteAddr, 1<<10)
 	if err != nil {
 		log.Println(err)
@@ -33,7 +35,24 @@ func main() {
 		log.Print("UDP Server stop now...")
 		return s.Stop(ctx)
 	})
-	// Elegant stop
+
+	// gRPC
+	gs, err := server.NewGRPCServer()
+	if err != nil {
+		log.Printf("%v", err)
+	}
+	g.Go(func() error {
+		log.Println("gRPC Server start.")
+		return gs.Start(ctx)
+	})
+	g.Go(func() error {
+		defer log.Printf("gRPC Server stop done.")
+		<-ctx.Done()
+		log.Printf("gRPC Server stop now...")
+		return gs.Stop(ctx)
+	})
+
+	// Graceful stop
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	g.Go(func() error {

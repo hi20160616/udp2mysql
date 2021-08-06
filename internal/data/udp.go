@@ -21,7 +21,7 @@ func NewUDPPacketRepo(data *Data) biz.UDPPacketRepo {
 }
 
 func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) (*biz.UDPPackets, error) {
-	us, err := ur.data.dbClient.UDPPacket.Query().All(ctx)
+	us, err := ur.data.DBClient.UDPPacket.Query().All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -34,13 +34,11 @@ func (ur *udpPacketRepo) ListUDPPackets(ctx context.Context) (*biz.UDPPackets, e
 			UpdateTime: timestamppb.New(u.UpdateTime),
 		})
 	}
-	return &biz.UDPPackets{
-		UdpPackets: bus,
-	}, nil
+	return &biz.UDPPackets{UdpPackets: bus}, nil
 }
 
 func (ur *udpPacketRepo) GetUDPPacket(ctx context.Context, name string) (*biz.UDPPacket, error) {
-	upkt, err := ur.data.dbClient.UDPPacket.Query().Where([4]string{"name", "=", name}).First(ctx)
+	upkt, err := ur.data.DBClient.UDPPacket.Query().Where([4]string{"id", "=", name}).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +59,7 @@ func (ur *udpPacketRepo) CreateUDPPacket(ctx context.Context, udp *biz.UDPPacket
 		Content:    udp.Content,
 		UpdateTime: udp.UpdateTime.AsTime(),
 	}
-	if err := ur.data.dbClient.UDPPacket.Insert(ctx, upktEnt); err != nil {
+	if err := ur.data.DBClient.UDPPacket.Insert(ctx, upktEnt); err != nil {
 		return nil, err
 	}
 	return udp, nil
@@ -75,12 +73,12 @@ func (ur *udpPacketRepo) UpdateUDPPacket(ctx context.Context, udp *biz.UDPPacket
 		Content:    udp.Content,
 		UpdateTime: udp.UpdateTime.AsTime(),
 	}
-	if err := ur.data.dbClient.UDPPacket.Update(ctx, upktEnt); err != nil {
+	if err := ur.data.DBClient.UDPPacket.Update(ctx, upktEnt); err != nil {
 		return nil, err
 	}
 	return udp, nil
 }
 
 func (ur *udpPacketRepo) DeleteUDPPacket(ctx context.Context, name string) error {
-	return ur.data.dbClient.UDPPacket.Delete(ctx, name)
+	return ur.data.DBClient.UDPPacket.Delete(ctx, name)
 }

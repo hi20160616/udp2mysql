@@ -5,6 +5,8 @@ import (
 
 	pb "github.com/hi20160616/udp2mysql/api/udp2mysql/v1"
 	"github.com/hi20160616/udp2mysql/internal/biz"
+	"github.com/hi20160616/udp2mysql/internal/data"
+	"github.com/hi20160616/udp2mysql/internal/data/db/mariadb"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -13,12 +15,14 @@ type UDPService struct {
 	udp *biz.UDPPacketUsecase
 }
 
-// func NewUDPService(udp *biz.UDPPacketUsecase) *UDPService {
-//         return &UDPService{
-//                 udp: udp,
-//         }
-// }
-//
+func InitUDPService() *UDPService {
+	dbc := mariadb.NewClient()
+	db := &data.Data{DBClient: dbc}
+	repo := data.NewUDPPacketRepo(db)
+	udpUsecase := biz.NewUDPPacketUsecase(repo)
+	return &UDPService{udp: udpUsecase}
+}
+
 func (us *UDPService) ListUDPPackets(ctx context.Context, req *pb.ListUDPPacketsRequest) (*pb.ListUDPPacketsResponse, error) {
 	udps, err := us.udp.List(ctx)
 	if err != nil {

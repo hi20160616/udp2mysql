@@ -1,6 +1,8 @@
 package server
 
 import (
+	"context"
+	"log"
 	"net"
 	"time"
 
@@ -12,23 +14,40 @@ import (
 
 type GRPC struct {
 	s *grpc.Server
-	l *net.Listener
+	l net.Listener
 }
 
-func NewGRPCServer(udp *service.UDPService) (*GRPC, error) {
+func NewGRPCServer() (*GRPC, error) {
 	t, err := time.ParseDuration(configs.V.API.GRPC.Timeout)
 	if err != nil {
 		return nil, err
 	}
 	opts := []grpc.ServerOption{
-		grpc.MaxMsgSize(1 << 30),
+		// grpc.MaxMsgSize(1 << 30),
 		grpc.ConnectionTimeout(t),
 	}
-	srv := grpc.NewServer(opts...)
-	pb.RegisterUDPPacketApiServer(srv, udp)
+	s := grpc.NewServer(opts...)
+	pb.RegisterUDPPacketApiServer(s, &service.UDPService{})
 	l, err := net.Listen("tcp", configs.V.API.GRPC.Addr)
 	if err != nil {
 		return nil, err
 	}
-	return &GRPC{srv, &l}, nil
+	return &GRPC{s, l}, nil
+}
+
+func (gs *GRPC) Start(ctx context.Context) error {
+	defer func() {
+		if err := recover(); err != nil {
+			e := err.(error)
+			log.Println(e)
+			PanicLog(e)
+		}
+	}()
+	defer gs.l.Close()
+	return gs.s.Serve(gs.l)
+}
+
+func (gs *GRPC) Stop(ctx context.Context) error {
+	gs.s.GracefulStop()
+	return nil
 }
