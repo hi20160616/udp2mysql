@@ -52,15 +52,29 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 		case <-time.After(30 * time.Second):
 			return fmt.Errorf("context was not done immediately")
 		default:
-			fmt.Print("-> ", string(ur.buf[0:n]), "\n")
-			reply := []byte(time.Now().String())
-			fmt.Printf("Server reply data: %s\n", reply)
-			_, err = ur.conn.WriteToUDP(reply, addr)
-			if err != nil {
-				log.Printf("%v", err)
+			if err = ur.deal(n, addr); err != nil {
+				log.Println(err)
 			}
 		}
 	}
+}
+
+// deal with udp packets
+func (ur *UDPReceiver) deal(n int, addr *net.UDPAddr) error {
+	// get bytes receive
+	u := ur.buf[0:n]
+	// TODO: dail to ms
+	// TODO: send udp packets to ms
+
+	// just for test workflow
+	fmt.Print("-> ", string(u), "\n")
+	reply := []byte(time.Now().String())
+	fmt.Printf("Server reply data: %s\n", reply)
+	_, err := ur.conn.WriteToUDP(reply, addr)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ur *UDPReceiver) Stop(ctx context.Context) error {
