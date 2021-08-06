@@ -22,7 +22,12 @@ func NewUDPReceiver(addr string, bufSize int) (*UDPReceiver, error) {
 	if err != nil {
 		return nil, err
 	}
+	l, err := net.ListenUDP("udp4", s)
+	if err != nil {
+		return nil, err
+	}
 	return &UDPReceiver{
+		conn:    l,
 		udpAddr: s,
 		buf:     make([]byte, bufSize),
 	}, nil
@@ -36,16 +41,10 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 			PanicLog(e)
 		}
 	}()
-
-	l, err := net.ListenUDP("udp4", ur.udpAddr)
-	if err != nil {
-		return err
-	}
-	defer l.Close()
-	ur.conn = l
+	defer ur.conn.Close()
 
 	for {
-		n, addr, err := l.ReadFromUDP(ur.buf)
+		n, addr, err := ur.conn.ReadFromUDP(ur.buf)
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -55,7 +54,7 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 			fmt.Print("-> ", string(ur.buf[0:n]), "\n")
 			reply := []byte(time.Now().String())
 			fmt.Printf("Server reply data: %s\n", reply)
-			_, err = l.WriteToUDP(reply, addr)
+			_, err = ur.conn.WriteToUDP(reply, addr)
 			if err != nil {
 				log.Printf("%v", err)
 			}
