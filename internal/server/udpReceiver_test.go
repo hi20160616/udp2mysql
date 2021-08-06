@@ -6,12 +6,10 @@ import (
 	"net"
 	"testing"
 	"time"
-
-	"github.com/hi20160616/udp2mysql/configs"
 )
 
 func TestUDPReceiver(t *testing.T) {
-	ur, err := NewUDPReceiver(configs.V.RemoteAddr, 1024)
+	ur, err := NewUDPReceiver()
 	if err != nil {
 		t.Error(err)
 	}

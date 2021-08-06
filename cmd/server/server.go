@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/hi20160616/udp2mysql/configs"
 	"github.com/hi20160616/udp2mysql/internal/server"
 	"golang.org/x/sync/errgroup"
 )
@@ -21,7 +20,7 @@ func main() {
 	g, ctx := errgroup.WithContext(ctx)
 
 	// UDPReceiver
-	s, err := server.NewUDPReceiver(configs.V.RemoteAddr, 1024)
+	s, err := server.NewUDPReceiver()
 	if err != nil {
 		log.Println(err)
 	}

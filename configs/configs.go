@@ -22,8 +22,11 @@ type configuration struct {
 		Driver string `json:"Driver"`
 		Source string `json:"Source"`
 	} `json:"database"`
-	RemoteAddr string `json:"remote_addr"`
-	Web        struct {
+	UDPSender struct {
+		Addr    string `json:"Addr"`
+		BufSize int    `json:"BufSize"`
+	} `json:"udp_sender"`
+	Web struct {
 		Addr string `json:"Addr"`
 		Tmpl string `json:"Tmpl"`
 	} `json:"web"`
