@@ -62,11 +62,11 @@ func TestGRPCServer(t *testing.T) {
 		t.Error(err)
 	}
 	fmt.Println(u)
-	// udps, err := c.ListUDPPackets(ctx, &pb.ListUDPPacketsRequest{})
-	// if err != nil {
-	//         t.Error(err)
-	// }
-	// for _, e := range udps.UdpPackets {
-	//         fmt.Println(e)
-	// }
+	udps, err := c.ListUDPPackets(ctx, &pb.ListUDPPacketsRequest{})
+	if err != nil {
+		t.Error(err)
+	}
+	for _, e := range udps.UdpPackets {
+		fmt.Println(e)
+	}
 }

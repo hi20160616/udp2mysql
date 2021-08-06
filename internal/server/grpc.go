@@ -27,7 +27,8 @@ func NewGRPCServer() (*GRPC, error) {
 		grpc.ConnectionTimeout(t),
 	}
 	s := grpc.NewServer(opts...)
-	pb.RegisterUDPPacketApiServer(s, &service.UDPService{})
+	us := service.InitUDPService()
+	pb.RegisterUDPPacketApiServer(s, us)
 	l, err := net.Listen("tcp", configs.V.API.GRPC.Addr)
 	if err != nil {
 		return nil, err
