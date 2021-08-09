@@ -2,13 +2,18 @@ package server
 
 import (
 	"context"
+	"crypto/md5"
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"time"
 
+	pb "github.com/hi20160616/udp2mysql/api/udp2mysql/v1"
 	"github.com/hi20160616/udp2mysql/configs"
 	myerr "github.com/hi20160616/udp2mysql/errors"
+	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type UDPReceiver struct {
@@ -60,17 +65,32 @@ func (ur *UDPReceiver) Start(ctx context.Context) error {
 }
 
 // deal with udp packets
+// addr is socket address, where is the udp receiver we can send msg to.
 func (ur *UDPReceiver) deal(n int, addr *net.UDPAddr) error {
 	// get bytes receive
 	u := ur.buf[0:n]
-	// TODO: dail to ms
-	// TODO: send udp packets to ms
-
+	// dail to ms
+	conn, err := grpc.Dial(configs.V.API.GRPC.Addr, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	c := pb.NewUDPPacketApiClient(conn)
+	// send udp packets to ms
+	_, err = c.CreateUDPPacket(context.Background(), &pb.CreateUDPPacketRequest{UdpPacket: &pb.UDPPacket{
+		Id:         fmt.Sprintf("%x", md5.Sum([]byte(strconv.Itoa(time.Now().Nanosecond())))),
+		Title:      string(u[:10]),
+		Content:    string(u),
+		UpdateTime: timestamppb.Now(),
+	}})
+	if err != nil {
+		return err
+	}
 	// just for test workflow
 	fmt.Print("-> ", string(u), "\n")
 	reply := []byte(time.Now().String())
 	fmt.Printf("Server reply data: %s\n", reply)
-	_, err := ur.conn.WriteToUDP(reply, addr)
+	_, err = ur.conn.WriteToUDP(reply, addr)
 	if err != nil {
 		return err
 	}
