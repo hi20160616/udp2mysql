@@ -13,7 +13,7 @@ import (
 )
 
 func TestUDPReceiver(t *testing.T) {
-	s, err := net.ResolveUDPAddr("udp4", configs.V.UDPSender.Addr)
+	s, err := net.ResolveUDPAddr("udp4", configs.V.UDPReceiver.Addr)
 	if err != nil {
 		t.Error(err)
 	}

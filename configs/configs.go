@@ -22,10 +22,10 @@ type configuration struct {
 		Driver string `json:"Driver"`
 		Source string `json:"Source"`
 	} `json:"database"`
-	UDPSender struct {
+	UDPReceiver struct {
 		Addr    string `json:"Addr"`
 		BufSize int    `json:"BufSize"`
-	} `json:"udp_sender"`
+	} `json:"udp_receiver"`
 	Web struct {
 		Addr string `json:"Addr"`
 		Tmpl string `json:"Tmpl"`

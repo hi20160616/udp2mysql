@@ -24,7 +24,7 @@ type UDPReceiver struct {
 
 // addr seems like "127.0.0.1:1234"
 func NewUDPReceiver() (*UDPReceiver, error) {
-	s, err := net.ResolveUDPAddr("udp4", configs.V.UDPSender.Addr)
+	s, err := net.ResolveUDPAddr("udp4", configs.V.UDPReceiver.Addr)
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func NewUDPReceiver() (*UDPReceiver, error) {
 	return &UDPReceiver{
 		conn:    l,
 		udpAddr: s,
-		buf:     make([]byte, configs.V.UDPSender.BufSize),
+		buf:     make([]byte, configs.V.UDPReceiver.BufSize),
 	}, nil
 }
 
