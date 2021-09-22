@@ -2,19 +2,26 @@ package configs
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
-var ProjectName = "udp2mysql"
+// var ProjectName = "udp2mysql"
+type ProjectName string
 
-type configuration struct {
-	RootPath string
-	API      struct {
+type Config struct {
+	ProjectName ProjectName
+	RootPath    string
+	Raw         []byte
+	Debug       bool
+	Verbose     bool // if true, prompt enter to exit.
+	LogName     string
+	Err         error
+
+	API struct {
 		GRPC api `json:"grpc"`
 		HTTP api `json:"http"`
 	} `json:"api"`
@@ -36,54 +43,84 @@ type api struct {
 	Addr, Timeout string
 }
 
-var V = &configuration{}
+func NewConfig(projectName ProjectName) *Config {
+	return setRootPath(&Config{ProjectName: projectName}).load()
+}
 
-func setRootPath() error {
+func setRootPath(cfg *Config) *Config {
+	cfg.RootPath, cfg.Err = os.Getwd()
+	if cfg.Err != nil {
+		return cfg
+	}
 	if strings.Contains(os.Args[0], ".test") {
-		rootPath4Test()
-		return nil
+		return rootPath4Test(cfg)
 	}
-	root, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	V.RootPath = root
-	return nil
+	return cfg
 }
 
-func load() error {
-	cf := filepath.Join(V.RootPath, "configs/configs.json")
-	f, err := os.ReadFile(cf)
-	if err != nil {
-		return err
+func rootPath4Test(cfg *Config) *Config {
+	cfg.RootPath, cfg.Err = os.Getwd()
+	if cfg.Err != nil {
+		return cfg
 	}
-	return json.Unmarshal(f, V)
-}
-
-func init() {
-	if err := setRootPath(); err != nil {
-		log.Printf("configs init error: %v", err)
-	}
-	if err := load(); err != nil {
-		log.Printf("configs load error: %v", err)
-	}
-}
-
-func rootPath4Test() error {
-	root, err := os.Getwd()
-	fmt.Println(root)
-	if err != nil {
-		return err
-	}
-	ps := strings.Split(root, ProjectName)
+	ps := strings.Split(cfg.RootPath, string(cfg.ProjectName))
 	n := 0
-	if runtime.GOOS == "windows" {
-		n = strings.Count(ps[1], "\\")
-	} else {
-		n = strings.Count(ps[1], "/")
+	if len(ps) > 1 {
+		n = strings.Count(ps[1], string(os.PathSeparator))
 	}
 	for i := 0; i < n; i++ {
-		V.RootPath = filepath.Join("../", V.RootPath)
+		cfg.RootPath = filepath.Join("../", "./")
 	}
-	return nil
+	return cfg
+}
+
+func (c *Config) load() *Config {
+	if c.Err != nil {
+		return c
+	}
+	cfgFile := filepath.Join(c.RootPath, "configs", "configs.json")
+	c.Raw, c.Err = os.ReadFile(cfgFile)
+	if c.Err != nil {
+		if errors.Is(c.Err, os.ErrNotExist) {
+			c.Err = errors.WithMessage(c.Err, "ReadFile error: no configs.json")
+		}
+		return c
+	}
+	cfgTemp := &Config{}
+	if c.Err = json.Unmarshal(c.Raw, cfgTemp); c.Err != nil {
+		c.Err = errors.WithMessage(c.Err, "Unmarshal configs.json error")
+		return c
+	}
+	c.Debug = cfgTemp.Debug
+	c.Verbose = cfgTemp.Verbose
+	c.LogName = cfgTemp.LogName
+	c.ProjectName = cfgTemp.ProjectName
+	c.API = cfgTemp.API
+	c.Database = cfgTemp.Database
+	c.UDPReceiver = cfgTemp.UDPReceiver
+	c.Web = cfgTemp.Web
+
+	// // load *.json
+	// loadJson := func(filename string) ([]string, error) {
+	//         fp := filepath.Join(c.RootPath, "configs", filename)
+	//         fJson, err := os.ReadFile(fp)
+	//         if err != nil {
+	//                 if errors.Is(err, os.ErrNotExist) {
+	//                         log.Println("warning: no ", filename)
+	//                 } else {
+	//                         return nil, err
+	//                 }
+	//         }
+	//         keywords := []string{}
+	//         if err = json.Unmarshal(fJson, &keywords); err != nil {
+	//                 return nil, errors.WithMessagef(err, "Unmarshal %s error", filename)
+	//         }
+	//         return keywords, nil
+	// }
+	//
+	// // load focuses.json
+	// c.Filter.Focuses, c.Err = loadJson("focuses.json")
+	// // load spams.json
+	// c.Filter.Spams, c.Err = loadJson("spams.json")
+	return c
 }

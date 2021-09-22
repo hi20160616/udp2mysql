@@ -1,4 +1,7 @@
 {
+    "Debug": false,
+    "Verbose": false,
+    "LogName":"log.txt",
     "api":{
 	"grpc":{
 	    "Addr": ":8000",
@@ -10,15 +13,15 @@
 	}
     },
     "database":{
-	    "Driver": "mysql",
-	    "Source": "udp2mysql:udp2mysqlPasswd@tcp(127.0.0.1:3306)/udp2mysql?loc=Asia%2FShanghai&parseTime=true"
+	"Driver": "mysql",
+	"Source": "udp2mysql:udp2mysqlPasswd@tcp(127.0.0.1:3306)/udp2mysql?loc=Asia%2FShanghai&parseTime=true"
     },
     "udp_receiver":{
-	    "Addr": "127.0.0.1:123",
-	    "BufSize": 1024
+	"Addr": "127.0.0.1:123",
+	"BufSize": 1024
     },
     "web":{
-	    "Addr": ":80",
-	    "Tmpl": "templates"
+	"Addr": ":80",
+	"Tmpl": "templates"
     }
 }
